@@ -85,3 +85,46 @@ app.get("/", (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Serve a simple HTML form for testing
+app.get("/test", (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>BFHL API Test</title>
+      <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        input, textarea { width: 300px; padding: 8px; margin: 5px 0; }
+        button { padding: 8px 15px; }
+        pre { background: #f4f4f4; padding: 10px; border-radius: 5px; }
+      </style>
+    </head>
+    <body>
+      <h2>Test BFHL API</h2>
+      <form id="apiForm">
+        <label>Enter array (comma separated):</label><br>
+        <input type="text" id="data" placeholder='Example: a,1,334,4,R,$' /><br><br>
+        <button type="submit">Submit</button>
+      </form>
+      <h3>Response:</h3>
+      <pre id="response"></pre>
+
+      <script>
+        const form = document.getElementById("apiForm");
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          const input = document.getElementById("data").value.split(",").map(s => s.trim());
+          const res = await fetch("/bfhl", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ data: input })
+          });
+          const json = await res.json();
+          document.getElementById("response").textContent = JSON.stringify(json, null, 2);
+        });
+      </script>
+    </body>
+    </html>
+  `);
+});
+
